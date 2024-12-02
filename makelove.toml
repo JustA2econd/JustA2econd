@@ -1,0 +1,8 @@
+name = "cs50x-final"
+default_targets = ["win32", "win64"]
+build_directory = "makelove-build"
+
+love_files = [
+    "::git-ls-tree::",
+    "-*/.*",
+]
