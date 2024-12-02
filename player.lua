@@ -61,6 +61,9 @@ function Player:update(dt)
             if collision.normal.x == 1 or collision.normal.x == -1 then
                 self.speed_x = 0
                 self.normal_x = collision.normal.x
+                if self.speed_y > 100 then
+                    self.speed_y = self.speed_y - 650 * dt
+                end
             end
             if collision.normal.y == 1 or collision.normal.y == -1 then
                 self.speed_y = 0
@@ -81,6 +84,7 @@ end
 function Player:draw()
     -- Draw the player
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+    love.graphics.print("speed_y = "..self.speed_y, 30, 30)
 end
 
 
