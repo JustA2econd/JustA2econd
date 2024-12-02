@@ -44,8 +44,8 @@ function Player:update(dt)
     self.x = self.x + self.speed_x * dt
     self.y = self.y + self.speed_y * dt
 
-    -- Check collision
-    -- TODO
+    -- Adjust for collision
+    self.x, self.y = world:move(player, self.x, self.y)
 
     -- Change gravity
     if not self.ground then
