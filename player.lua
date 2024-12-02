@@ -15,6 +15,7 @@ function Player:new(x, y)
     self.cols_len = 0
     self.normal_x = 0
     self.normal_y = 0
+    self.walljump = -350
 end
 
 function Player:update(dt)
@@ -69,10 +70,11 @@ function Player:update(dt)
     end
 
     -- Apply gravity
-    if self.normal_y == 0 then
+    if self.normal_y ~= -1 then
         self.speed_y = self.speed_y + 700 * dt
     else
         self.speed_y = 0
+        self.walljump = -350
     end
 end
 
@@ -88,10 +90,16 @@ function Player:keypressed(key)
         if self.normal_y == -1 then
             -- Do nothing (don't wall jump if on the floor)
         elseif self.normal_x == 1 then
-            self.speed_y = -250
+            if not (self.walljump > 0) then
+                self.speed_y = self.walljump
+                self.walljump = self.walljump + 100
+            end
             self.speed_x = 400
         elseif self.normal_x == -1 then
-            self.speed_y = -250
+            if not (self.walljump > 0) then
+                self.speed_y = self.walljump
+                self.walljump = self.walljump + 100
+            end
             self.speed_x = -400
         end
     end
