@@ -9,6 +9,8 @@ function love.load()
     Object = require "classic" -- Classic library from https://github.com/rxi/classic
     require "player"
     player = Player(50, 50)
+    require "level"
+    require "levels.1"
 end
 
 function love.update(dt)
@@ -17,6 +19,9 @@ end
 
 function love.draw()
     player:draw()
-    love.graphics.print("speed_x = " .. player.speed_x, 20, 20)
-    love.graphics.print("speed_y = " .. player.speed_y, 20, 40)
+    level:draw()
+end
+
+function love.keypressed(key)
+    player:keypressed(key)
 end
