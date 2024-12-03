@@ -18,6 +18,24 @@ function Player:new(x, y)
     self.walljump = -350
 end
 
+local solFilter = function(item, other)
+    for i, v in ipairs(solblock) do
+        if v.name == other then
+            return "cross"
+        end
+    end
+    return "slide"
+end
+
+local luaFilter = function(item, other)
+    for i, v in ipairs(luablock) do
+        if v.name == other then
+            return "cross"
+        end
+    end
+    return "slide"
+end
+
 function Player:update(dt)
     -- Accelerate right
     if love.keyboard.isDown("right") and not love.keyboard.isDown("left") then
@@ -58,17 +76,21 @@ function Player:update(dt)
     -- Check for collision and adjust
     self.normal_x = 0
     self.normal_y = 0
-    self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y)
+    if world_state == 1 then
+        self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, luaFilter)
+    elseif world_state == 2 then
+        self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, solFilter)
+    end
     if self.cols[1] then
         for i, collision in ipairs(self.cols) do
-            if collision.normal.x == 1 or collision.normal.x == -1 then
+            if (collision.normal.x == 1 or collision.normal.x == -1) and collision.type ~= "cross" then
                 self.speed_x = 0
                 self.normal_x = collision.normal.x
                 if self.speed_y > 100 then
                     self.speed_y = self.speed_y - 650 * dt
                 end
             end
-            if collision.normal.y == 1 or collision.normal.y == -1 then
+            if (collision.normal.y == 1 or collision.normal.y == -1) and collision.type ~= "cross" then
                 self.speed_y = 0
                 self.normal_y = collision.normal.y
             end
@@ -116,4 +138,22 @@ function Player:keypressed(key)
     if key == "space" then
         switchWorld()
     end
+end
+
+function Player:checkOtherState()
+    local test = {}
+    test.x, test.y, test.cols, test.cols_len = 0, 0, 0, 0
+    if world_state == 1 then
+        test.x, test.y, test.cols, test.cols_len = world:check(player, self.x, self.y, luaFilter)
+    elseif world_state == 2 then
+        test.x, test.y, test.cols, test.cols_len = world:check(player, self.x, self.y, solFilter)
+    end
+    if self.cols[1] then
+        for i, collision in ipairs(self.cols) do
+            if collision.type == "cross" then
+                return false
+            end
+        end
+    end
+    return true
 end

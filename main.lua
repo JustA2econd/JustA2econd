@@ -25,6 +25,7 @@ function love.load()
                 world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
                 table.insert(solblock, {name = x..","..y, x = x, y = y})
             elseif tile == 3 then
+                world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
                 table.insert(luablock, {name = x..","..y, x = x, y = y})
             end
         end
@@ -47,20 +48,12 @@ end
 
 function switchWorld()
     if world_state == 1 then
-        world_state = 2
-        for i, tile in ipairs(solblock) do
-            world:remove(tile.name)
-        end
-        for i, tile in ipairs(luablock) do
-            world:add(tile.name, tile.x * 20 - 20, tile.y * 20 - 20, 20, 20)
+        if player:checkOtherState() then
+            world_state = 2
         end
     elseif world_state == 2 then
-        world_state = 1
-        for i, tile in ipairs(luablock) do
-            world:remove(tile.name)
-        end
-        for i, tile in ipairs(solblock) do
-            world:add(tile.name, tile.x * 20 - 20, tile.y * 20 - 20, 20, 20)
+        if player:checkOtherState() then
+            world_state = 1
         end
     end
 end
