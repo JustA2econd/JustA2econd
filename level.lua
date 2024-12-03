@@ -5,11 +5,11 @@ function Level:new(tilemap)
 end
 
 local function stencil_func_far()
-    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 180)
+    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 180 + (player.switch_meter - player.switch_meter_projection) * 10)
 end
 
 local function stencil_func_near()
-    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 120)
+    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 120 + (player.switch_meter - player.switch_meter_projection) * 10)
 end
 
 -- This is based on https://sheepolution.com/learn/book/18 (How to LÖVE - Tilemaps)

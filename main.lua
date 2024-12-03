@@ -15,6 +15,7 @@ function love.load()
     solblock = {}
     luablock = {}
     world_state = 1
+    require "ui"
     require "level"
     require "levels.1"
     for y, row in ipairs(level.tilemap) do
@@ -39,7 +40,7 @@ end
 function love.draw()
     level:draw()
     player:draw()
-    
+    drawUI()
 end
 
 function love.keypressed(key)
@@ -48,12 +49,8 @@ end
 
 function switchWorld()
     if world_state == 1 then
-        if player:checkOtherState() then
-            world_state = 2
-        end
+        world_state = 2
     elseif world_state == 2 then
-        if player:checkOtherState() then
-            world_state = 1
-        end
+        world_state = 1
     end
 end

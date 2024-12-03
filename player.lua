@@ -10,6 +10,11 @@ function Player:new(x, y)
     -- Speed
     self.speed_x = 0
     self.speed_y = 0
+    -- State-switch Meter
+    self.switch_meter = 0
+    self.switch_meter_projection = 0
+    self.switch_meter_target = -50
+    self.switch_meter_falling = false
     -- Other stuff
     self.cols = {}
     self.cols_len = 0
@@ -37,6 +42,38 @@ local luaFilter = function(item, other)
 end
 
 function Player:update(dt)
+    -- Update the switch meter
+    if love.keyboard.isDown("space") and not self.switch_meter_falling then
+        if self.switch_meter_projection <= self.switch_meter_target then
+            switchWorld()
+            self.switch_meter_projection = self.switch_meter_target
+            self.switch_meter_falling = true
+        elseif self.switch_meter_target >= 0 and (self.switch_meter - self.switch_meter_projection < 40) then
+            self.switch_meter_projection = self.switch_meter_projection - 50 * dt
+        elseif self.switch_meter_target >= 0 and (self.switch_meter - self.switch_meter_projection >= 40) then
+            if self:checkOtherState() then
+                self.switch_meter_projection = self.switch_meter_projection - 50 * dt
+            end
+        end
+    elseif self.switch_meter_falling then
+        self.switch_meter = self.switch_meter - 50 * dt
+        if self.switch_meter <= self.switch_meter_target then
+            self.switch_meter_falling = false
+            self.switch_meter_target = self.switch_meter_target - 50
+        end
+    else
+        if self.switch_meter_projection >= self.switch_meter then
+            self.switch_meter = self.switch_meter + 33 * dt
+            if self.switch_meter > 100 then
+                self.switch_meter = 100
+            end
+            self.switch_meter_projection = self.switch_meter
+        else
+            self.switch_meter_projection = self.switch_meter_projection + 50 * dt
+        end
+        self.switch_meter_target = self.switch_meter - 50
+    end
+
     -- Accelerate right
     if love.keyboard.isDown("right") and not love.keyboard.isDown("left") then
         self.speed_x = self.speed_x + 1500 * dt
@@ -109,10 +146,9 @@ end
 function Player:draw()
     -- Draw the player
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
-    love.graphics.print("x = "..self.x, 30, 30)
-    love.graphics.print("y = "..self.y, 30, 50)
-    love.graphics.print("speed_x = "..self.speed_x, 30, 70)
-    love.graphics.print("speed_y = "..self.speed_y, 30, 90)
+    love.graphics.print("meter = "..self.switch_meter, 30, 120)
+    love.graphics.print("projection = "..self.switch_meter_projection, 30, 140)
+    love.graphics.print("target = "..self.switch_meter_target, 30, 160)
 end
 
 
@@ -134,9 +170,6 @@ function Player:keypressed(key)
             end
             self.speed_x = -400
         end
-    end
-    if key == "space" then
-        switchWorld()
     end
 end
 
