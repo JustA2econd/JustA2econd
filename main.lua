@@ -12,12 +12,20 @@ function love.load()
     require "player"
     player = Player(50, 50)
     world:add(player, player.x, player.y, player.width, player.height)
+    solblock = {}
+    luablock = {}
+    world_state = 1
     require "level"
     require "levels.1"
     for y, row in ipairs(level.tilemap) do
         for x, tile in ipairs(row) do
             if tile == 1 then
                 world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
+            elseif tile == 2 then
+                world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
+                table.insert(solblock, {name = x..","..y, x = x, y = y})
+            elseif tile == 3 then
+                table.insert(luablock, {name = x..","..y, x = x, y = y})
             end
         end
     end
@@ -28,10 +36,31 @@ function love.update(dt)
 end
 
 function love.draw()
-    player:draw()
     level:draw()
+    player:draw()
+    
 end
 
 function love.keypressed(key)
     player:keypressed(key)
+end
+
+function switchWorld()
+    if world_state == 1 then
+        world_state = 2
+        for i, tile in ipairs(solblock) do
+            world:remove(tile.name)
+        end
+        for i, tile in ipairs(luablock) do
+            world:add(tile.name, tile.x * 20 - 20, tile.y * 20 - 20, 20, 20)
+        end
+    elseif world_state == 2 then
+        world_state = 1
+        for i, tile in ipairs(luablock) do
+            world:remove(tile.name)
+        end
+        for i, tile in ipairs(solblock) do
+            world:add(tile.name, tile.x * 20 - 20, tile.y * 20 - 20, 20, 20)
+        end
+    end
 end

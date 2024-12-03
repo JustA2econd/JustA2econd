@@ -47,6 +47,9 @@ function Player:update(dt)
     elseif self.speed_x <= -500 then
         self.speed_x = -500
     end
+    if self.speed_y >= 800 then
+        self.speed_y = 800
+    end
 
     -- Update positions based on speed
     self.x = self.x + self.speed_x * dt
@@ -84,7 +87,10 @@ end
 function Player:draw()
     -- Draw the player
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
-    love.graphics.print("speed_y = "..self.speed_y, 30, 30)
+    love.graphics.print("x = "..self.x, 30, 30)
+    love.graphics.print("y = "..self.y, 30, 50)
+    love.graphics.print("speed_x = "..self.speed_x, 30, 70)
+    love.graphics.print("speed_y = "..self.speed_y, 30, 90)
 end
 
 
@@ -106,5 +112,8 @@ function Player:keypressed(key)
             end
             self.speed_x = -400
         end
+    end
+    if key == "space" then
+        switchWorld()
     end
 end
