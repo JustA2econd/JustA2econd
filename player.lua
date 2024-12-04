@@ -43,7 +43,7 @@ end
 
 function Player:update(dt)
     -- Update the switch meter
-    if love.keyboard.isDown("space") and not self.switch_meter_falling then
+    if love.keyboard.isDown(Swap.key) and not self.switch_meter_falling then
         if self.switch_meter_projection <= self.switch_meter_target then
             switchWorld()
             self.switch_meter_projection = self.switch_meter_target
@@ -75,10 +75,10 @@ function Player:update(dt)
     end
 
     -- Accelerate right
-    if love.keyboard.isDown("right") and not love.keyboard.isDown("left") then
+    if love.keyboard.isDown(Right.key) and not love.keyboard.isDown(Left.key) then
         self.speed_x = self.speed_x + 1500 * dt
     -- Accelerate left
-    elseif love.keyboard.isDown("left") and not love.keyboard.isDown("right") then
+    elseif love.keyboard.isDown(Left.key) and not love.keyboard.isDown(Right.key) then
         self.speed_x = self.speed_x - 1500 * dt
     -- If not touching one key, slow down
     else
@@ -92,7 +92,7 @@ function Player:update(dt)
     end
 
     -- Jump
-    if love.keyboard.isDown("up") and self.normal_y == -1 then
+    if love.keyboard.isDown(Jump.key) and self.normal_y == -1 then
         self.speed_y = -400
     end
 
@@ -146,14 +146,11 @@ end
 function Player:draw()
     -- Draw the player
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
-    love.graphics.print("meter = "..self.switch_meter, 30, 120)
-    love.graphics.print("projection = "..self.switch_meter_projection, 30, 140)
-    love.graphics.print("target = "..self.switch_meter_target, 30, 160)
 end
 
 
 function Player:keypressed(key)
-    if key == "up" then
+    if key == Jump.key then
         -- Handle walljumping
         if self.normal_y == -1 then
             -- Do nothing (don't wall jump if on the floor)

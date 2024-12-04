@@ -6,18 +6,35 @@ end
 
 
 function love.load()
-    Object = require "classic" -- Classic library from https://github.com/rxi/classic
-    local bump = require "bump" -- Bump library for collision from https://github.com/kikito/bump.lua
-    world = bump.newWorld(64)
+    Object = require "libraries.classic" -- Classic library from https://github.com/rxi/classic
+    local bump = require "libraries.bump" -- Bump library for collision from https://github.com/kikito/bump.lua
+    lume = require "libraries.lume" -- Lume library for saving and loading files from https://github.com/rxi/lume
+    
+    Bahnschrift_sm = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 30)
+    Bahnschrift_lg = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 100)
+    Arrow = love.graphics.newImage("images/arrow.png")
+    Switch = love.graphics.newImage("images/switch.png")
+    
+    data = {} -- Saving and loading files coming soon
+    
+    require "settings"
+    require "button"
+    require "pause"
     require "player"
+    require "ui"
+    require "level"
+    require "levels.1"
+
+    world = bump.newWorld(64)
     player = Player(50, 50)
+    
     world:add(player, player.x, player.y, player.width, player.height)
     solblock = {}
     luablock = {}
     world_state = 1
-    require "ui"
-    require "level"
-    require "levels.1"
+    mouse_state = love.mouse.isDown(1)
+    
+    
     for y, row in ipairs(level.tilemap) do
         for x, tile in ipairs(row) do
             if tile == 1 then
@@ -34,17 +51,40 @@ function love.load()
 end
 
 function love.update(dt)
-    player:update(dt)
+    if not paused then
+        player:update(dt)
+    else
+        if mouse_state ~= love.mouse.isDown(1) and not love.mouse.isDown(1) then
+            pauseClick()
+        end
+    end
+    mouse_state = love.mouse.isDown(1)
 end
 
 function love.draw()
+    love.graphics.setFont(Bahnschrift_sm)
     level:draw()
     player:draw()
     drawUI()
+    if paused then
+        drawPauseMenu()
+    end
 end
 
 function love.keypressed(key)
-    player:keypressed(key)
+    if not paused then
+        player:keypressed(key)
+    elseif key ~= "escape" then
+        keyPressedWhilePaused(key)
+    end
+    if key == "escape" then
+        if paused then
+            editing = nil
+            paused = false
+        else
+            paused = true
+        end
+    end
 end
 
 function switchWorld()
