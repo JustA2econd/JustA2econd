@@ -12,6 +12,10 @@ local function stencil_func_near()
     love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 120 + (player.switch_meter - player.switch_meter_projection) * 10)
 end
 
+local function stencil_func_transition()
+    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, (-20 + (player.switch_meter - player.switch_meter_projection)) * 20)
+end
+
 -- This is based on https://sheepolution.com/learn/book/18 (How to LÖVE - Tilemaps)
 function Level:draw()
     love.graphics.setStencilTest("greater", 0)
@@ -23,12 +27,22 @@ function Level:draw()
                 if world_state == 1 then
                     love.graphics.setColor(0.75, 0.88, 1, 0.15)
                 elseif world_state == 2 then
-                    love.graphics.setColor(1, 1, 0.75, 0.1)
+                    love.graphics.setColor(1, 1, 0.75, 0.15)
                 end
                 love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
 
                 love.graphics.stencil(stencil_func_near, "replace", 1)
                 love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+
+                if player.switch_meter - player.switch_meter_projection >= 20 then
+                    if world_state == 1 then
+                        love.graphics.setColor(0.75, 0.88, 1, 0.6)
+                    elseif world_state == 2 then
+                        love.graphics.setColor(1, 1, 0.75, 0.6)
+                    end
+                    love.graphics.stencil(stencil_func_transition, "replace", 1)
+                    love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+                end
             end
         end
     end

@@ -15,9 +15,20 @@ function love.load()
     Arrow = love.graphics.newImage("images/arrow.png")
     Switch = love.graphics.newImage("images/switch.png")
     
-    data = {} -- Saving and loading files coming soon
-    
     require "settings"
+
+    if love.filesystem.getInfo("controls.txt") then
+        local control_file = love.filesystem.read("controls.txt")
+        local data = lume.deserialize(control_file)
+
+        if data.left ~= nil and data.right ~= nil and data.jump ~= nil and data.switch ~= nil then
+            Left.key = data.left
+            Right.key = data.right
+            Jump.key = data.jump
+            Swap.key = data.switch
+        end
+    end
+    
     require "button"
     require "pause"
     require "player"
@@ -80,6 +91,15 @@ function love.keypressed(key)
     if key == "escape" then
         if paused then
             editing = nil
+            
+            local data = {}
+            data.left = Left.key
+            data.right = Right.key
+            data.jump = Jump.key
+            data.switch = Swap.key
+            local txt_data = lume.serialize(data)
+            love.filesystem.write("controls.txt", txt_data)
+
             paused = false
         else
             paused = true
