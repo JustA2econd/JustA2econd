@@ -10,10 +10,9 @@ function love.load()
     local bump = require "libraries.bump" -- Bump library for collision from https://github.com/kikito/bump.lua
     lume = require "libraries.lume" -- Lume library for saving and loading files from https://github.com/rxi/lume
     
-    Bahnschrift_sm = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 30)
-    Bahnschrift_lg = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 100)
-    Arrow = love.graphics.newImage("images/arrow.png")
-    Switch = love.graphics.newImage("images/switch.png")
+    require "assets"
+    loadGraphics()
+    loadAudio()
     
     require "settings"
 
@@ -90,6 +89,7 @@ function love.keypressed(key)
     end
     if key == "escape" then
         if paused then
+            Unpause:play()
             editing = nil
             
             local data = {}
@@ -102,6 +102,7 @@ function love.keypressed(key)
 
             paused = false
         else
+            Pause:play()
             paused = true
         end
     end
