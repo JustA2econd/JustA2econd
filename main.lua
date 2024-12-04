@@ -1,3 +1,4 @@
+
 if arg[2] == "debug" then
     require("lldebugger").start()
 end
@@ -6,9 +7,13 @@ end
 
 
 function love.load()
+    love.graphics.setDefaultFilter( 'nearest', 'nearest' ) -- Suggested by https://github.com/kikito/gamera?tab=readme-ov-file#faq to remove blur
+
     Object = require "libraries.classic" -- Classic library from https://github.com/rxi/classic
     local bump = require "libraries.bump" -- Bump library for collision from https://github.com/kikito/bump.lua
     lume = require "libraries.lume" -- Lume library for saving and loading files from https://github.com/rxi/lume
+    local gamera = require "libraries.gamera" -- Gamera library controls the camera from https://github.com/kikito/gamera
+    cam = gamera.new(0, 0, 2000, 2000)
     
     require "assets"
     loadGraphics()
@@ -61,6 +66,7 @@ function love.load()
 end
 
 function love.update(dt)
+    cam:setPosition(player.x, player.y)
     if not paused then
         player:update(dt)
     else
@@ -71,10 +77,14 @@ function love.update(dt)
     mouse_state = love.mouse.isDown(1)
 end
 
-function love.draw()
+function draw()
     love.graphics.setFont(Bahnschrift_sm)
     level:draw()
     player:draw()
+end
+
+function love.draw()
+    cam:draw(draw)
     drawUI()
     if paused then
         drawPauseMenu()

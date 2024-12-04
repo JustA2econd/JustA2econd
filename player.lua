@@ -208,18 +208,20 @@ function Player:keypressed(key)
         if self.normal_y == -1 then
             -- Do nothing (don't wall jump if on the floor)
         elseif self.normal_x == 1 then
-            Walljump:play()
             if not (self.walljump > 0) then
                 self.speed_y = self.walljump
                 self.walljump = self.walljump + 100
             end
+            Walljump:setPitch((self.walljump+350)/100)
+            Walljump:play()
             self.speed_x = 400
         elseif self.normal_x == -1 then
-            Walljump:play()
             if not (self.walljump > 0) then
                 self.speed_y = self.walljump
                 self.walljump = self.walljump + 100
             end
+            Walljump:setPitch((self.walljump+350)/100)
+            Walljump:play()
             self.speed_x = -400
         end
     end
