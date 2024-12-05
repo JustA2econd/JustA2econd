@@ -197,8 +197,13 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    if world_state == 1 then
+        love.graphics.setColor(1, 1, 0.75 + (self.switch_meter - self.switch_meter_projection)/200, 1)
+    elseif world_state == 2 then
+        love.graphics.setColor(0.75 + (self.switch_meter - self.switch_meter_projection)/200, 0.88  + (self.switch_meter - self.switch_meter_projection)/416, 1, 1)
+    end
     -- Draw the player
-    love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+    love.graphics.draw(Squaracter, player.x, player.y)
 end
 
 

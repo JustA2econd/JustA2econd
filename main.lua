@@ -54,12 +54,12 @@ function love.load()
     
     for y, row in ipairs(level.tilemap) do
         for x, tile in ipairs(row) do
-            if tile == 1 then
+            if isWorld(tile) then
                 world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
-            elseif tile == 2 then
+            elseif isSol(tile) then
                 world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
                 table.insert(solblock, {name = x..","..y, x = x, y = y})
-            elseif tile == 3 then
+            elseif isLua(tile) then
                 world:add(x..","..y, x * 20 - 20, y * 20 - 20, 20, 20)
                 table.insert(luablock, {name = x..","..y, x = x, y = y})
             end
@@ -144,6 +144,33 @@ function love.keypressed(key)
             paused = true
         end
     end
+end
+
+function isWorld(input)
+    for i=1,9 do
+        if input == tostring(i) then
+            return true
+        end
+    end
+    return false
+end
+
+function isSol(input)
+    for i=1,9 do
+        if input == "a"..i then
+            return true
+        end
+    end
+    return false
+end
+
+function isLua(input)
+    for i=1,9 do
+        if input == "b"..i then
+            return true
+        end
+    end
+    return false
 end
 
 function switchWorld()

@@ -1,6 +1,9 @@
 function loadGraphics()
     Bahnschrift_sm = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 30)
     Bahnschrift_lg = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 100)
+
+    Squaracter = love.graphics.newImage("images/squaracter.png")
+
     Arrow = love.graphics.newImage("images/arrow.png")
     Switch = love.graphics.newImage("images/switch.png")
 end

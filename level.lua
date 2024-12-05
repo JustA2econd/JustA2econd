@@ -22,7 +22,7 @@ function Level:draw()
     
     for y, row in ipairs(self.tilemap) do
         for x, tile in ipairs(row) do
-            if (world_state == 1 and tile == 3) or (world_state == 2 and tile == 2) then
+            if (world_state == 1 and isLua(tile)) or (world_state == 2 and isSol(tile)) then
                 love.graphics.stencil(stencil_func_far, "replace", 1)
                 if world_state == 1 then
                     love.graphics.setColor(0.75, 0.88, 1, 0.15)
@@ -49,18 +49,18 @@ function Level:draw()
     love.graphics.setStencilTest()
     for y, row in ipairs(self.tilemap) do
         for x, tile in ipairs(row) do
-            if tile == 1 then
+            if isWorld(tile) then
                 love.graphics.setColor(1, 1, 1, 1)
                 love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
-            elseif tile == world_state + 1 then
-                if world_state == 1 then
+            else
+                if world_state == 1 and isSol(tile) then
                     love.graphics.setColor(1, 1, 0.75, 1)
-                elseif world_state == 2 then
+                    love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+                elseif world_state == 2 and isLua(tile) then
                     love.graphics.setColor(0.75, 0.88, 1, 1)
+                    love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
                 end
-                love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
             end
         end
     end
-    
 end
