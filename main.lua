@@ -13,8 +13,10 @@ function love.load()
     local bump = require "libraries.bump" -- Bump library for collision from https://github.com/kikito/bump.lua
     lume = require "libraries.lume" -- Lume library for saving and loading files from https://github.com/rxi/lume
     local gamera = require "libraries.gamera" -- Gamera library controls the camera from https://github.com/kikito/gamera
-    cam = gamera.new(0, 0, 2000, 2000)
     
+    cam = gamera.new(0, 0, 800, 600)
+    camera_settings = {["x"]=0, ["y"]=0, ["transition_x"]=0, ["trans_duration_x"]=0}
+
     require "assets"
     loadGraphics()
     loadAudio()
@@ -66,7 +68,27 @@ function love.load()
 end
 
 function love.update(dt)
-    cam:setPosition(player.x, player.y)
+    cam:setPosition(player.x + player.width/2, player.y + player.height/2)
+
+    if camera_settings.transition_x == 0 then
+        if player.x > (camera_settings.x + 1) * 800 then
+            camera_settings.transition_x = -1
+            camera_settings.trans_duration_x = 1
+            camera_settings.x = camera_settings.x + 1
+        elseif (player.x + player.width) < camera_settings.x * 800 then
+            camera_settings.transition_x = 1
+            camera_settings.trans_duration_x = 1
+            camera_settings.x = camera_settings.x - 1
+        end
+    end
+
+    cam:setWorld((camera_settings.x + (camera_settings.trans_duration_x^2) * camera_settings.transition_x) * 800, camera_settings.y * 800, 800, 600)
+
+    if not player.switch_meter_falling then
+        cam:setScale(((player.switch_meter - player.switch_meter_projection)/80)^2 + 1)
+    else
+        cam:setScale(((player.switch_meter - player.switch_meter_projection)/80)^2 + 1)
+    end
     if not paused then
         player:update(dt)
     else
@@ -75,6 +97,12 @@ function love.update(dt)
         end
     end
     mouse_state = love.mouse.isDown(1)
+    if camera_settings.trans_duration_x > 0 then
+        camera_settings.trans_duration_x = camera_settings.trans_duration_x - 1 * dt
+    else
+        camera_settings.trans_duration_x = 0
+        camera_settings.transition_x = 0
+    end
 end
 
 function draw()
