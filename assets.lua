@@ -45,6 +45,7 @@ function loadAudio()
     SwitchMeter = love.audio.newSource("sounds/switch_meter.wav", "static")
     SwitchMeter:setLooping(true)
     SwitchReady = love.audio.newSource("sounds/switch_ready.wav", "static")
+    SwitchWarning = love.audio.newSource("sounds/switch_warning.wav", "static")
     Pause = love.audio.newSource("sounds/pause.wav", "static")
     Unpause = love.audio.newSource("sounds/unpause.wav", "static")
 end

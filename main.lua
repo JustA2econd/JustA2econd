@@ -44,6 +44,7 @@ function love.load()
 
     world = bump.newWorld(64)
     player = Player(850, 50)
+    warning = false
     
     world:add(player, player.x, player.y, player.width, player.height)
     solblock = {}

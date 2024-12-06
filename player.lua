@@ -79,6 +79,10 @@ function Player:update(dt)
                 SwitchMeter:setVolume((self.switch_meter - self.switch_meter_projection) / 50)
             else
                 SwitchMeter:setVolume(0.3)
+                if not SwitchWarning:isPlaying() then
+                    SwitchWarning:play()
+                    warning = not warning
+                end
             end
         end
     elseif self.switch_meter_falling then

@@ -16,4 +16,13 @@ function drawUI()
     end
     love.graphics.setColor(1, 0, 0, 0.6)
     love.graphics.rectangle("fill", player.switch_meter_projection * 7.4 + 30, 30, (player.switch_meter - player.switch_meter_projection) * 7.4, 50)
+    if SwitchWarning:isPlaying() then
+        love.graphics.setColor(1, 1, 1, 1)
+        if warning then
+            love.graphics.print("PATH BLOCKED", player.switch_meter_projection * 7.4 + 30, 33)
+        else
+            love.graphics.print("CAN'T SWITCH", player.switch_meter_projection * 7.4 + 30, 33)
+        end
+    end
 end
+
