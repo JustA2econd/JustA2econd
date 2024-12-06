@@ -51,14 +51,14 @@ function Level:draw()
         for x, tile in ipairs(row) do
             if isWorld(tile) then
                 love.graphics.setColor(1, 1, 1, 1)
-                love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+                love.graphics.draw(WTiles[tonumber(tile)], x * 20 - 20, y * 20 - 20)
             else
                 if world_state == 1 and isSol(tile) then
                     love.graphics.setColor(1, 1, 0.75, 1)
-                    love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+                    love.graphics.draw(STiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
                 elseif world_state == 2 and isLua(tile) then
                     love.graphics.setColor(0.75, 0.88, 1, 1)
-                    love.graphics.rectangle("fill", x * 20 - 20, y * 20 - 20, 20, 20)
+                    love.graphics.draw(STiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
                 end
             end
         end

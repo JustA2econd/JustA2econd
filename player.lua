@@ -4,8 +4,9 @@ function Player:new(x, y)
     -- Position
     self.x = x
     self.y = y
+    self.direction = 1
     -- Size
-    self.width = 50
+    self.width = 42
     self.height = 50
     -- Speed
     self.speed_x = 0
@@ -17,6 +18,7 @@ function Player:new(x, y)
     self.switch_meter_falling = false
     -- Other stuff
     self.walljump = -350
+    self.step = 0
     self.step_cooldown = 0
     self.cols = {}
     self.cols_len = 0
@@ -44,6 +46,14 @@ local luaFilter = function(item, other)
 end
 
 function Player:update(dt)
+    self.speed_y = self.speed_y + 700 * dt
+
+    if self.speed_x > 10 then
+        self.direction = 1
+    elseif self.speed_x < -10 then
+        self.direction = -1
+    end
+
     -- Update the switch meter
     if love.keyboard.isDown(Swap.key) and not self.switch_meter_falling then
         if self.switch_meter_projection <= self.switch_meter_target then
@@ -113,6 +123,7 @@ function Player:update(dt)
             self.speed_x = self.speed_x + 1500 * dt
         else
             self.speed_x = 0
+            self.step = 0
         end
     end
 
@@ -139,7 +150,7 @@ function Player:update(dt)
     -- Check for collision and adjust
     self.normal_x = 0
     self.normal_y = 0
-    local slide = false
+    slide = false
     if world_state == 1 then
         self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, luaFilter)
     elseif world_state == 2 then
@@ -159,6 +170,7 @@ function Player:update(dt)
                     if not Slide:isPlaying() then
                         Slide:play()
                     end
+                    self.direction = self.normal_x
                 end
             end
             if (collision.normal.y == 1 or collision.normal.y == -1) and collision.type ~= "cross" then
@@ -179,40 +191,57 @@ function Player:update(dt)
         Slide:pause()
     end
     if (self.speed_x < -100 or self.speed_x > 100) and self.step_cooldown <= 0 and self.normal_y == -1 then
-        Step:play()
+        if self.step == 0 then
+            self.step = 1
+            Step:play()
+        else
+            self.step = 0
+        end
         self.step_cooldown = 50/(math.abs(self.speed_x))
     end
 
-    -- Apply gravity
-    if self.normal_y ~= -1 then
-        self.speed_y = self.speed_y + 700 * dt
-    else
+    -- Counteract gravity
+    if self.normal_y == -1 then
         self.speed_y = 0
         self.walljump = -350
     end
 
     if self.step_cooldown > 0 then
-        self.step_cooldown = self.step_cooldown - 1 * dt
+        self.step_cooldown = self.step_cooldown - 2 * dt
     end
 end
 
 function Player:draw()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(PlayerBody, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
     if world_state == 1 then
         love.graphics.setColor(1, 1, 0.75 + (self.switch_meter - self.switch_meter_projection)/200, 1)
     elseif world_state == 2 then
         love.graphics.setColor(0.75 + (self.switch_meter - self.switch_meter_projection)/200, 0.88  + (self.switch_meter - self.switch_meter_projection)/416, 1, 1)
     end
     -- Draw the player
-    love.graphics.draw(Squaracter, player.x, player.y)
+    if slide then
+        love.graphics.draw(PlayerSlide, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+    elseif self.speed_y > 0 then
+        love.graphics.draw(PlayerFall, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+    elseif self.speed_y < -150 then
+        love.graphics.draw(PlayerRise, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+    elseif self.speed_x == 0 then
+        love.graphics.draw(PlayerIdle, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+    else
+        if self.step == 1 then
+            love.graphics.draw(PlayerStep1, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        else
+            love.graphics.draw(PlayerStep2, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        end
+    end
 end
 
 
 function Player:keypressed(key)
-    if key == Jump.key then
+    if key == Jump.key and self.speed_y ~= 0 then
         -- Handle walljumping
-        if self.normal_y == -1 then
-            -- Do nothing (don't wall jump if on the floor)
-        elseif self.normal_x == 1 then
+        if self.normal_x == 1 then
             if not (self.walljump > 0) then
                 self.speed_y = self.walljump
                 self.walljump = self.walljump + 100

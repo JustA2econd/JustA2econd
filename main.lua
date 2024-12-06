@@ -43,12 +43,12 @@ function love.load()
     require "levels.1"
 
     world = bump.newWorld(64)
-    player = Player(50, 50)
+    player = Player(850, 50)
     
     world:add(player, player.x, player.y, player.width, player.height)
     solblock = {}
     luablock = {}
-    world_state = 1
+    world_state = 2
     mouse_state = love.mouse.isDown(1)
     
     
@@ -147,7 +147,7 @@ function love.keypressed(key)
 end
 
 function isWorld(input)
-    for i=1,9 do
+    for i=1,29 do
         if input == tostring(i) then
             return true
         end
@@ -156,7 +156,7 @@ function isWorld(input)
 end
 
 function isSol(input)
-    for i=1,9 do
+    for i=1,29 do
         if input == "a"..i then
             return true
         end
@@ -165,7 +165,7 @@ function isSol(input)
 end
 
 function isLua(input)
-    for i=1,9 do
+    for i=1,29 do
         if input == "b"..i then
             return true
         end

@@ -2,7 +2,30 @@ function loadGraphics()
     Bahnschrift_sm = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 30)
     Bahnschrift_lg = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 100)
 
-    Squaracter = love.graphics.newImage("images/squaracter.png")
+    PlayerBody = love.graphics.newImage("images/player_body.png")
+    PlayerIdle = love.graphics.newImage("images/player_idle.png")
+    PlayerStep1 = love.graphics.newImage("images/player_step_1.png")
+    PlayerStep2 = love.graphics.newImage("images/player_step_2.png")
+    PlayerRise = love.graphics.newImage("images/player_rising.png")
+    PlayerFall = love.graphics.newImage("images/player_falling.png")
+    PlayerSlide = love.graphics.newImage("images/player_slide.png")
+
+    local tiles_references = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "11", "13", "14", "17", "18", "19", "21", "22", "23", "24", "26", "27", "28", "29"}
+    WTiles = {}
+    STiles = {}
+    for i=1,29 do
+        for _, j in ipairs(tiles_references) do
+            if tostring(i) == j then
+                table.insert(WTiles, love.graphics.newImage("images/"..i..".png"))
+                table.insert(STiles, love.graphics.newImage("images/s"..i..".png"))
+                break
+            end 
+        end
+        if WTiles[i] == nil then
+            table.insert(WTiles, love.graphics.newImage("images/invalid.png"))
+            table.insert(STiles, love.graphics.newImage("images/invalid.png"))
+        end
+    end
 
     Arrow = love.graphics.newImage("images/arrow.png")
     Switch = love.graphics.newImage("images/switch.png")
