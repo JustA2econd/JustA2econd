@@ -216,6 +216,9 @@ function Player:update(dt)
 end
 
 function Player:draw()
+    if SwitchWarning:isPlaying() and warning then
+        love.graphics.setBlendMode("add")
+    end
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(PlayerBody, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
     if world_state == 1 then
@@ -239,6 +242,7 @@ function Player:draw()
             love.graphics.draw(PlayerStep2, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
         end
     end
+    love.graphics.setBlendMode("alpha")
 end
 
 
