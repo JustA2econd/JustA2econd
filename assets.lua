@@ -22,7 +22,7 @@ function loadGraphics()
             table.insert(STiles, love.graphics.newImage("images/invalid.png"))
         end
         if love.filesystem.getInfo("images/d"..i..".png") then
-
+            table.insert(DTiles, love.graphics.newImage("images/d"..i..".png"))
         else
             table.insert(DTiles, love.graphics.newImage("images/invalid.png"))
         end
