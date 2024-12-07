@@ -43,13 +43,13 @@ function love.load()
     require "levels.1"
 
     world = bump.newWorld(64)
-    player = Player(1650, 260)
+    player = Player(28, 25)
     warning = false
     
     world:add(player, player.x, player.y, player.width, player.height)
     solblock = {}
     luablock = {}
-    world_state = 2
+    world_state = 1
     mouse_state = love.mouse.isDown(1)
     
     

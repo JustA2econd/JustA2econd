@@ -16,25 +16,33 @@ local function stencil_func_transition()
     love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, (-20 + (player.switch_meter - player.switch_meter_projection)) * 20)
 end
 
+local function stencil_func_full()
+    love.graphics.circle("fill", player.x + player.width / 2, player.y + player.height / 2, 1000)
+end
+
 -- This is based on https://sheepolution.com/learn/book/18 (How to LÖVE - Tilemaps)
 function Level:draw()
-    love.graphics.setStencilTest()
+    love.graphics.setStencilTest("greater", 0)
     for y, row in ipairs(self.tilemap) do
         if y <= 30 then
             for x, tile in ipairs(row) do
                 if x >= (camera_settings.x + (camera_settings.trans_duration_x^2) * camera_settings.transition_x) * 40 and x <= (camera_settings.x + (camera_settings.trans_duration_x^2) * camera_settings.transition_x) * 40 + 41 then
                     if (world_state == 1 and isDecor(tile) == 3) or (world_state == 2 and isDecor(tile) == 2) then
                         love.graphics.setColor(1, 1, 1, 0.15)
+                        love.graphics.stencil(stencil_func_far, "replace", 1)
                         love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
 
+                        love.graphics.stencil(stencil_func_near, "replace", 1)
                         love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
 
                         if player.switch_meter - player.switch_meter_projection >= 20 then
                             love.graphics.setColor(1, 1, 1, 0.6)
+                            love.graphics.stencil(stencil_func_transition, "replace", 1)
                             love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
                         end
                     elseif (world_state == 1 and isDecor(tile) == 2) or (world_state == 2 and isDecor(tile) == 3) or isDecor(tile) == 1 then
                         love.graphics.setColor(1, 1, 1, 1)
+                        love.graphics.stencil(stencil_func_full, "replace", 1)
                         
                         love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
                     end
@@ -42,7 +50,6 @@ function Level:draw()
             end
         end
     end
-love.graphics.setStencilTest("greater", 0)
     for y, row in ipairs(self.tilemap) do
         if y <= 30 then
             for x, tile in ipairs(row) do
