@@ -1,9 +1,4 @@
-
-if arg[2] == "debug" then
-    require("lldebugger").start()
-end
--- Debug handler (end) from https://sheepolution.com/learn/book/bonus/vscode
--- I learned LOVE2D from this tutorial
+-- I learned LOVE2D from https://sheepolution.com/learn/book/bonus/vscode
 
 
 function love.load()
