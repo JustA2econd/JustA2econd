@@ -10,20 +10,21 @@ function loadGraphics()
     PlayerFall = love.graphics.newImage("images/player_falling.png")
     PlayerSlide = love.graphics.newImage("images/player_slide.png")
 
-    local tiles_references = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "11", "13", "14", "17", "18", "19", "21", "22", "23", "24", "26", "27", "28", "29"}
     WTiles = {}
     STiles = {}
-    for i=1,29 do
-        for _, j in ipairs(tiles_references) do
-            if tostring(i) == j then
-                table.insert(WTiles, love.graphics.newImage("images/"..i..".png"))
-                table.insert(STiles, love.graphics.newImage("images/s"..i..".png"))
-                break
-            end 
-        end
-        if WTiles[i] == nil then
+    DTiles = {}
+    for i=1,30 do
+        if love.filesystem.getInfo("images/"..i..".png") then
+            table.insert(WTiles, love.graphics.newImage("images/"..i..".png"))
+            table.insert(STiles, love.graphics.newImage("images/s"..i..".png"))
+        else
             table.insert(WTiles, love.graphics.newImage("images/invalid.png"))
             table.insert(STiles, love.graphics.newImage("images/invalid.png"))
+        end
+        if love.filesystem.getInfo("images/d"..i..".png") then
+
+        else
+            table.insert(DTiles, love.graphics.newImage("images/invalid.png"))
         end
     end
 

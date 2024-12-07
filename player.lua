@@ -60,6 +60,7 @@ function Player:update(dt)
             switchWorld()
             SwitchSound:play()
             SwitchMeter:stop()
+            warning = false
             self.switch_meter_projection = self.switch_meter_target
             self.switch_meter_falling = true
         elseif self.switch_meter_target >= 0 and (self.switch_meter - self.switch_meter_projection < 40) then
@@ -99,6 +100,7 @@ function Player:update(dt)
                 self.switch_meter = 100
                 if SwitchMeter:isPlaying() then
                     SwitchMeter:stop()
+                    warning = false
                 end
             end
             self.switch_meter_projection = self.switch_meter

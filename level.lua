@@ -18,8 +18,30 @@ end
 
 -- This is based on https://sheepolution.com/learn/book/18 (How to LÖVE - Tilemaps)
 function Level:draw()
-    love.graphics.setStencilTest("greater", 0)
-    
+    for y, row in ipairs(self.tilemap) do
+        for x, tile in ipairs(row) do
+            if (world_state == 1 and isDecor(tile) == 3) or (world_state == 2 and isDecor(tile) == 2) then
+                love.graphics.setStencilTest("greater", 0)
+                love.graphics.setColor(1, 1, 1, 0.15)
+                love.graphics.stencil(stencil_func_far, "replace", 1)
+                love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
+
+                love.graphics.stencil(stencil_func_near, "replace", 1)
+                love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
+
+                if player.switch_meter - player.switch_meter_projection >= 20 then
+                    love.graphics.setColor(1, 1, 1, 0.6)
+                    love.graphics.stencil(stencil_func_transition, "replace", 1)
+                    love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
+                end
+            elseif (world_state == 1 and isDecor(tile) == 2) or (world_state == 2 and isDecor(tile) == 3) or isDecor(tile) == 1 then
+                love.graphics.setColor(1, 1, 1, 1)
+                love.graphics.setStencilTest()
+                love.graphics.draw(DTiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
+            end
+        end
+    end
+love.graphics.setStencilTest("greater", 0)
     for y, row in ipairs(self.tilemap) do
         for x, tile in ipairs(row) do
             if (world_state == 1 and isLua(tile)) or (world_state == 2 and isSol(tile)) then

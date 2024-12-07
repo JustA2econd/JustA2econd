@@ -43,7 +43,7 @@ function love.load()
     require "levels.1"
 
     world = bump.newWorld(64)
-    player = Player(850, 50)
+    player = Player(1650, 260)
     warning = false
     
     world:add(player, player.x, player.y, player.width, player.height)
@@ -148,7 +148,7 @@ function love.keypressed(key)
 end
 
 function isWorld(input)
-    for i=1,29 do
+    for i=1,30 do
         if input == tostring(i) then
             return true
         end
@@ -157,7 +157,7 @@ function isWorld(input)
 end
 
 function isSol(input)
-    for i=1,29 do
+    for i=1,30 do
         if input == "a"..i then
             return true
         end
@@ -166,12 +166,27 @@ function isSol(input)
 end
 
 function isLua(input)
-    for i=1,29 do
+    for i=1,30 do
         if input == "b"..i then
             return true
         end
     end
     return false
+end
+
+function isDecor(input)
+    for i=1,30 do
+        if input == "d"..i then
+            if i >= 1 and i <= 10 then
+                return 1
+            elseif i >= 11 and i <= 20 then
+                return 2
+            elseif i >= 21 and i <= 30 then
+                return 3
+            end
+        end
+    end
+    return 0
 end
 
 function switchWorld()
