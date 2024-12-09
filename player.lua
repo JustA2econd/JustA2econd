@@ -1,7 +1,7 @@
 -- Create player class
 Player = Object:extend()
 
--- Player object has many attributes
+-- Player object has many properties
 function Player:new(x, y)
     -- Position
     self.x = x
@@ -154,13 +154,6 @@ function Player:update(dt)
         -- Apply gravity
         self.speed_y = self.speed_y + 700 * dt
 
-        -- Set the player's direction
-        if self.speed_x > 10 then
-            self.direction = 1
-        elseif self.speed_x < -10 then
-            self.direction = -1
-        end
-
         -- Accelerate right
         if love.keyboard.isDown(Right.key) and not love.keyboard.isDown(Left.key) then
             self.speed_x = self.speed_x + 1500 * dt
@@ -179,10 +172,11 @@ function Player:update(dt)
             end
         end
 
-        -- Jump
-        if love.keyboard.isDown(Jump.key) and self.normal_y == -1 then
-            self.speed_y = -400
-            JumpSound:play()
+        -- Set the player's direction
+        if self.speed_x > 10 then
+            self.direction = 1
+        elseif self.speed_x < -10 then
+            self.direction = -1
         end
 
         -- Terminal velocity (x)
@@ -195,6 +189,12 @@ function Player:update(dt)
             self.speed_y = 800
         end
 
+        -- Jump
+        if love.keyboard.isDown(Jump.key) and self.normal_y == -1 then
+            self.speed_y = -400
+            JumpSound:play()
+        end
+        
         -- Update positions based on speed
         self.x = self.x + self.speed_x * dt
         self.y = self.y + self.speed_y * dt
