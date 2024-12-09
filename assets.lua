@@ -4,6 +4,9 @@ function loadGraphics()
     Bahnschrift_sm = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 30) -- Small, 30pt font
     Bahnschrift_lg = love.graphics.newFont("/fonts/BAHNSCHRIFT.TTF", 100) -- Large, 100pt font
 
+    -- Load title screen
+    Title = love.graphics.newImage("images/title.png")
+
     -- Load all player sprites
     PlayerBody = love.graphics.newImage("images/player_body.png")
     PlayerIdle = love.graphics.newImage("images/player_idle.png")

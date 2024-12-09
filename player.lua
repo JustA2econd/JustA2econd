@@ -14,9 +14,9 @@ function Player:new(x, y)
     self.speed_x = 0
     self.speed_y = 0
     -- State-switch Meter
-    self.switch_meter = 0
-    self.switch_meter_projection = 0
-    self.switch_meter_target = -50
+    self.switch_meter = 100
+    self.switch_meter_projection = 100
+    self.switch_meter_target = 50
     self.switch_meter_falling = false
     -- Other stuff
     self.walljump = -350 -- Wall jump height, gets smaller over time
@@ -50,16 +50,6 @@ local luaFilter = function(item, other)
 end
 
 function Player:update(dt)
-    -- Apply gravity
-    self.speed_y = self.speed_y + 700 * dt
-
-    -- Set the player's direction
-    if self.speed_x > 10 then
-        self.direction = 1
-    elseif self.speed_x < -10 then
-        self.direction = -1
-    end
-
     -- Update the switch meter
     -- If space (or whatever Switch is) is held, do something
     if love.keyboard.isDown(Swap.key) and not self.switch_meter_falling then
@@ -160,194 +150,205 @@ function Player:update(dt)
         -- Set the meter target to 50 less than the current meter
         self.switch_meter_target = self.switch_meter - 50
     end
+    if world_state ~= 0 then
+        -- Apply gravity
+        self.speed_y = self.speed_y + 700 * dt
 
-    -- Accelerate right
-    if love.keyboard.isDown(Right.key) and not love.keyboard.isDown(Left.key) then
-        self.speed_x = self.speed_x + 1500 * dt
-    -- Accelerate left
-    elseif love.keyboard.isDown(Left.key) and not love.keyboard.isDown(Right.key) then
-        self.speed_x = self.speed_x - 1500 * dt
-    -- If not touching one key, slow down
-    else
-        if self.speed_x >= 10 then
-            self.speed_x = self.speed_x - 1500 * dt
-        elseif self.speed_x <= -10 then
+        -- Set the player's direction
+        if self.speed_x > 10 then
+            self.direction = 1
+        elseif self.speed_x < -10 then
+            self.direction = -1
+        end
+
+        -- Accelerate right
+        if love.keyboard.isDown(Right.key) and not love.keyboard.isDown(Left.key) then
             self.speed_x = self.speed_x + 1500 * dt
+        -- Accelerate left
+        elseif love.keyboard.isDown(Left.key) and not love.keyboard.isDown(Right.key) then
+            self.speed_x = self.speed_x - 1500 * dt
+        -- If not touching one key, slow down
         else
-            self.speed_x = 0
-            self.step = 0
-        end
-    end
-
-    -- Jump
-    if love.keyboard.isDown(Jump.key) and self.normal_y == -1 then
-        self.speed_y = -400
-        JumpSound:play()
-    end
-
-    -- Terminal velocity (x)
-    if self.speed_x >= 500 then
-        self.speed_x = 500
-    elseif self.speed_x <= -500 then
-        self.speed_x = -500
-    end
-    if self.speed_y >= 800 then
-        self.speed_y = 800
-    end
-
-    -- Update positions based on speed
-    self.x = self.x + self.speed_x * dt
-    self.y = self.y + self.speed_y * dt
-
-    -- Check for collision and adjust
-    self.normal_x = 0
-    self.normal_y = 0
-    slide = false
-    -- If world state is 1, go through Lua blocks
-    if world_state == 1 then
-        self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, luaFilter)
-    -- If world state is 2, go through Sol blocks
-    elseif world_state == 2 then
-        self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, solFilter)
-    end
-    -- If there are any collisions, update player accordingly
-    if self.cols[1] then
-        for i, collision in ipairs(self.cols) do
-            -- If colliding with wall...
-            if (collision.normal.x == 1 or collision.normal.x == -1) and collision.type ~= "cross" then
-                -- Play a bump sound if going fast enough
-                if self.speed_x < -300 or self.speed_x > 300 then
-                    Bump:play()
-                end
-                -- Reset x speed to 0
+            if self.speed_x >= 10 then
+                self.speed_x = self.speed_x - 1500 * dt
+            elseif self.speed_x <= -10 then
+                self.speed_x = self.speed_x + 1500 * dt
+            else
                 self.speed_x = 0
-                -- Update player normal
-                self.normal_x = collision.normal.x
-                -- If player is falling, start wall sliding
-                if self.speed_y > 100 then
-                    -- Counteract gravity
-                    self.speed_y = self.speed_y - 650 * dt
-                    slide = true
-                    -- Play slide sound
-                    if not Slide:isPlaying() then
-                        Slide:play()
+                self.step = 0
+            end
+        end
+
+        -- Jump
+        if love.keyboard.isDown(Jump.key) and self.normal_y == -1 then
+            self.speed_y = -400
+            JumpSound:play()
+        end
+
+        -- Terminal velocity (x)
+        if self.speed_x >= 500 then
+            self.speed_x = 500
+        elseif self.speed_x <= -500 then
+            self.speed_x = -500
+        end
+        if self.speed_y >= 800 then
+            self.speed_y = 800
+        end
+
+        -- Update positions based on speed
+        self.x = self.x + self.speed_x * dt
+        self.y = self.y + self.speed_y * dt
+
+        -- Check for collision and adjust
+        self.normal_x = 0
+        self.normal_y = 0
+        slide = false
+        -- If world state is 1, go through Lua blocks
+        if world_state == 1 then
+            self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, luaFilter)
+        -- If world state is 2, go through Sol blocks
+        elseif world_state == 2 then
+            self.x, self.y, self.cols, self.cols_len = world:move(player, self.x, self.y, solFilter)
+        end
+        -- If there are any collisions, update player accordingly
+        if self.cols[1] then
+            for i, collision in ipairs(self.cols) do
+                -- If colliding with wall...
+                if (collision.normal.x == 1 or collision.normal.x == -1) and collision.type ~= "cross" then
+                    -- Play a bump sound if going fast enough
+                    if self.speed_x < -300 or self.speed_x > 300 then
+                        Bump:play()
                     end
-                    -- Set direction to face away from the wall
-                    self.direction = self.normal_x
+                    -- Reset x speed to 0
+                    self.speed_x = 0
+                    -- Update player normal
+                    self.normal_x = collision.normal.x
+                    -- If player is falling, start wall sliding
+                    if self.speed_y > 100 then
+                        -- Counteract gravity
+                        self.speed_y = self.speed_y - 650 * dt
+                        slide = true
+                        -- Play slide sound
+                        if not Slide:isPlaying() then
+                            Slide:play()
+                        end
+                        -- Set direction to face away from the wall
+                        self.direction = self.normal_x
+                    end
+                end
+                -- If colliding with floor or ceiling...
+                if (collision.normal.y == 1 or collision.normal.y == -1) and collision.type ~= "cross" then
+                    -- Play landing sound depending on speed
+                    if collision.normal.y == -1 then
+                        if self.speed_y > 600 then
+                            LargeLanding:play()
+                        elseif self.speed_y > 300 then
+                            SmallLanding:play()
+                        end
+                    end
+                    -- Reset y speed and update normal
+                    self.speed_y = 0
+                    self.normal_y = collision.normal.y
+                    
                 end
             end
-            -- If colliding with floor or ceiling...
-            if (collision.normal.y == 1 or collision.normal.y == -1) and collision.type ~= "cross" then
-                -- Play landing sound depending on speed
-                if collision.normal.y == -1 then
-                    if self.speed_y > 600 then
-                        LargeLanding:play()
-                    elseif self.speed_y > 300 then
-                        SmallLanding:play()
-                    end
+        end
+        -- If not sliding, stop playing slide sound
+        if not slide and Slide:isPlaying() then
+            Slide:pause()
+        end
+        -- If moving on the ground, update step variables
+        if (self.speed_x < -100 or self.speed_x > 100) and self.step_cooldown <= 0 and self.normal_y == -1 then
+            if self.step == 0 then
+                self.step = 1
+                -- Play the step sound every other step phase
+                Step:play()
+            else
+                self.step = 0
+            end
+            -- Set step cooldown based on speed
+            self.step_cooldown = 50/(math.abs(self.speed_x))
+        end
+
+        -- Counteract gravity if on the floor
+        if self.normal_y == -1 then
+            self.speed_y = 0
+            self.walljump = -350
+        end
+
+        -- Decrease step cooldown
+        if self.step_cooldown > 0 then
+            self.step_cooldown = self.step_cooldown - 2 * dt
+        end
+    end
+
+    function Player:draw()
+        -- If switch warning mode is true and playing warning sound, set blend mode so that the player is almost seethrough
+        if SwitchWarning:isPlaying() and warning then
+            love.graphics.setBlendMode("add")
+        end
+        -- Default colors to draw player body
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(PlayerBody, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+
+        -- If Sol phase, update outline color accordingly
+        if world_state == 1 then
+            love.graphics.setColor(1, 1, 0.75 + (self.switch_meter - self.switch_meter_projection)/200, 1)
+        -- If Lua phase, update outline color accordingly
+        elseif world_state == 2 then
+            love.graphics.setColor(0.75 + (self.switch_meter - self.switch_meter_projection)/200, 0.88  + (self.switch_meter - self.switch_meter_projection)/416, 1, 1)
+        end
+        -- Draw the player
+        -- If sliding, then use slide sprite
+        if slide then
+            love.graphics.draw(PlayerSlide, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        -- If falling, use falling sprite
+        elseif self.speed_y > 0 then
+            love.graphics.draw(PlayerFall, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        -- If jumping, use rising sprite
+        elseif self.speed_y < -150 then
+            love.graphics.draw(PlayerRise, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        -- If not moving, use idle sprite
+        elseif self.speed_x == 0 then
+            love.graphics.draw(PlayerIdle, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+        -- Otherwise, use a step sprite
+        else
+            if self.step == 1 then
+                love.graphics.draw(PlayerStep1, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+            else
+                love.graphics.draw(PlayerStep2, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
+            end
+        end
+        -- Reset blend mode
+        love.graphics.setBlendMode("alpha")
+    end
+
+
+    function Player:keypressed(key)
+        -- If player pressed the jump key and is not on the floor,
+        if key == Jump.key and self.speed_y ~= 0 then
+            -- Handle walljumping
+            if self.normal_x == 1 then
+                -- If walljump height is above 0, then increase y speed
+                if not (self.walljump > 0) then
+                    self.speed_y = self.walljump
+                    -- Decrease wall jump height
+                    self.walljump = self.walljump + 100
                 end
-                -- Reset y speed and update normal
-                self.speed_y = 0
-                self.normal_y = collision.normal.y
-                
+                -- Set wall jump sound pitch accordingly and play
+                Walljump:setPitch((self.walljump+350)/100)
+                Walljump:play()
+                -- Set x speed
+                self.speed_x = 400
+            elseif self.normal_x == -1 then
+                if not (self.walljump > 0) then
+                    self.speed_y = self.walljump
+                    self.walljump = self.walljump + 100
+                end
+                Walljump:setPitch((self.walljump+350)/100)
+                Walljump:play()
+                self.speed_x = -400
             end
-        end
-    end
-    -- If not sliding, stop playing slide sound
-    if not slide and Slide:isPlaying() then
-        Slide:pause()
-    end
-    -- If moving on the ground, update step variables
-    if (self.speed_x < -100 or self.speed_x > 100) and self.step_cooldown <= 0 and self.normal_y == -1 then
-        if self.step == 0 then
-            self.step = 1
-            -- Play the step sound every other step phase
-            Step:play()
-        else
-            self.step = 0
-        end
-        -- Set step cooldown based on speed
-        self.step_cooldown = 50/(math.abs(self.speed_x))
-    end
-
-    -- Counteract gravity if on the floor
-    if self.normal_y == -1 then
-        self.speed_y = 0
-        self.walljump = -350
-    end
-
-    -- Decrease step cooldown
-    if self.step_cooldown > 0 then
-        self.step_cooldown = self.step_cooldown - 2 * dt
-    end
-end
-
-function Player:draw()
-    -- If switch warning mode is true and playing warning sound, set blend mode so that the player is almost seethrough
-    if SwitchWarning:isPlaying() and warning then
-        love.graphics.setBlendMode("add")
-    end
-    -- Default colors to draw player body
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(PlayerBody, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-
-    -- If Sol phase, update outline color accordingly
-    if world_state == 1 then
-        love.graphics.setColor(1, 1, 0.75 + (self.switch_meter - self.switch_meter_projection)/200, 1)
-    -- If Lua phase, update outline color accordingly
-    elseif world_state == 2 then
-        love.graphics.setColor(0.75 + (self.switch_meter - self.switch_meter_projection)/200, 0.88  + (self.switch_meter - self.switch_meter_projection)/416, 1, 1)
-    end
-    -- Draw the player
-    -- If sliding, then use slide sprite
-    if slide then
-        love.graphics.draw(PlayerSlide, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-    -- If falling, use falling sprite
-    elseif self.speed_y > 0 then
-        love.graphics.draw(PlayerFall, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-    -- If jumping, use rising sprite
-    elseif self.speed_y < -150 then
-        love.graphics.draw(PlayerRise, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-    -- If not moving, use idle sprite
-    elseif self.speed_x == 0 then
-        love.graphics.draw(PlayerIdle, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-    -- Otherwise, use a step sprite
-    else
-        if self.step == 1 then
-            love.graphics.draw(PlayerStep1, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-        else
-            love.graphics.draw(PlayerStep2, player.x + (21 + 21 * -self.direction), player.y, 0, self.direction, 1)
-        end
-    end
-    -- Reset blend mode
-    love.graphics.setBlendMode("alpha")
-end
-
-
-function Player:keypressed(key)
-    -- If player pressed the jump key and is not on the floor,
-    if key == Jump.key and self.speed_y ~= 0 then
-        -- Handle walljumping
-        if self.normal_x == 1 then
-            -- If walljump height is above 0, then increase y speed
-            if not (self.walljump > 0) then
-                self.speed_y = self.walljump
-                -- Decrease wall jump height
-                self.walljump = self.walljump + 100
-            end
-            -- Set wall jump sound pitch accordingly and play
-            Walljump:setPitch((self.walljump+350)/100)
-            Walljump:play()
-            -- Set x speed
-            self.speed_x = 400
-        elseif self.normal_x == -1 then
-            if not (self.walljump > 0) then
-                self.speed_y = self.walljump
-                self.walljump = self.walljump + 100
-            end
-            Walljump:setPitch((self.walljump+350)/100)
-            Walljump:play()
-            self.speed_x = -400
         end
     end
 end

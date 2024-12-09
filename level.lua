@@ -119,16 +119,14 @@ function Level:draw()
                     if isWorld(tile) then
                         love.graphics.setColor(1, 1, 1, 1)
                         love.graphics.draw(WTiles[tonumber(tile)], x * 20 - 20, y * 20 - 20)
-                    else
-                        -- If Sol tile, set Sol color and draw tile sprite
-                        if world_state == 1 and isSol(tile) then
+                    -- If Sol tile, set Sol color and draw tile sprite
+                    elseif world_state == 1 and isSol(tile) then
                             love.graphics.setColor(1, 1, 0.75, 1)
                             love.graphics.draw(STiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
-                        -- If Lua tile, set Lua color and draw sprite
-                        elseif world_state == 2 and isLua(tile) then
-                            love.graphics.setColor(0.75, 0.88, 1, 1)
-                            love.graphics.draw(STiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
-                        end
+                    -- If Lua tile, set Lua color and draw sprite
+                    elseif world_state == 2 and isLua(tile) then
+                        love.graphics.setColor(0.75, 0.88, 1, 1)
+                        love.graphics.draw(STiles[tonumber(tile:sub(2, -1))], x * 20 - 20, y * 20 - 20)
                     end
                 end
             end

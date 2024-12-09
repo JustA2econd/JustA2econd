@@ -2,6 +2,7 @@
 
 
 function love.load()
+    love.window.setTitle("Switchgate")
     love.graphics.setDefaultFilter( 'nearest', 'nearest' ) -- Suggested by https://github.com/kikito/gamera?tab=readme-ov-file#faq to remove blur
 
     Object = require "libraries.classic" -- Classic library from https://github.com/rxi/classic
@@ -11,7 +12,7 @@ function love.load()
     
     -- Create camera to follow the player in the level
     cam = gamera.new(0, 0, 800, 600)
-    camera_settings = {["x"]=0, ["y"]=0, ["transition_x"]=0, ["trans_duration_x"]=0}
+    camera_settings = {["x"]=-1, ["y"]=0, ["transition_x"]=0, ["trans_duration_x"]=0}
 
     -- Load all assets
     require "assets"
@@ -57,8 +58,8 @@ function love.load()
     -- Create tables to hold the two phases of blocks
     solblock = {}
     luablock = {} -- This naming scheme is unrelated to the fact I am programming in Lua
-    -- World state is 1 by default (1 = Sol blocks collide, Lua blocks don't; 2 = opposite of that)
-    world_state = 1
+    -- World state is 0 by default (0 = title screen, used once; 1 = Sol blocks collide with player, Lua blocks don't; 2 = opposite of that)
+    world_state = 0
     -- Initialize the mouse_state variable do detect mouse left click
     mouse_state = love.mouse.isDown(1)
     
@@ -82,22 +83,25 @@ function love.load()
 end
 
 function love.update(dt)
-    -- Set the camera position to centered on the player
-    -- (Because of how the camera is set up, this only matters when zooming in)
-    cam:setPosition(player.x + player.width/2, player.y + player.height/2)
+    -- Update the camera if not on the title screen
+    if world_state ~= 0 then
+        -- Set the camera position to centered on the player
+        -- (Because of how the camera is set up, this only matters when zooming in)
+        cam:setPosition(player.x + player.width/2, player.y + player.height/2)
 
-    -- If the camera is not moving, check if the player is outside of the camera
-    if camera_settings.transition_x == 0 then
-        -- If player is too far right, trigger the right-moving transition
-        if player.x > (camera_settings.x + 1) * 800 then
-            camera_settings.transition_x = -1
-            camera_settings.trans_duration_x = 1
-            camera_settings.x = camera_settings.x + 1
-        -- If player is too far left, trigger the left-moving transition
-        elseif (player.x + player.width) < camera_settings.x * 800 then
-            camera_settings.transition_x = 1
-            camera_settings.trans_duration_x = 1
-            camera_settings.x = camera_settings.x - 1
+        -- If the camera is not moving, check if the player is outside of the camera
+        if camera_settings.transition_x == 0 then
+            -- If player is too far right, trigger the right-moving transition
+            if player.x > (camera_settings.x + 1) * 800 then
+                camera_settings.transition_x = -1
+                camera_settings.trans_duration_x = 1
+                camera_settings.x = camera_settings.x + 1
+            -- If player is too far left, trigger the left-moving transition
+            elseif (player.x + player.width) < camera_settings.x * 800 then
+                camera_settings.transition_x = 1
+                camera_settings.trans_duration_x = 1
+                camera_settings.x = camera_settings.x - 1
+            end
         end
     end
 
@@ -138,6 +142,11 @@ function draw()
 end
 
 function love.draw()
+    -- If world state 0, draw title screen
+    love.graphics.setColor(1, 1, 1, 1)
+    if world_state == 0 then
+        love.graphics.draw(Title, 0, 0)
+    end
     -- Draw things based on the world coordinates
     cam:draw(draw)
     -- Draw the UI (and pause menu) based on the screen coordinates (AKA follows the screen)
@@ -235,7 +244,7 @@ function switchWorld()
     if world_state == 1 then
         world_state = 2
     -- If currently in Lua, switch to Sol
-    elseif world_state == 2 then
+    else
         world_state = 1
     end
 end
